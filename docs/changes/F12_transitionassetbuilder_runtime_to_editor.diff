@@ -1,0 +1,37 @@
+--- /tmp/tab_orig.cs	2026-08-01 15:20:09.046458727 +0000
++++ /tmp/tab_new.cs	2026-08-01 15:20:09.046458727 +0000
+@@ -1,7 +1,18 @@
++#if UNITY_EDITOR
++
+ using System.Collections.Generic;
++using UnityEditor;
+ 
+-namespace FigmaRuntime
++namespace FigmaRuntime.Editor
+ {
++    /// <summary>
++    /// ADR-005 / ADR-008 (v0.3.7):
++    /// A TransitionAssetBuilder az Editor réteg része.
++    ///
++    /// A Runtime Analysis kimenetét (TrackCandidate lista) tölti bele
++    /// egy TransitionAsset-be. A Runtime NEM hívhatja — csak az
++    /// Editor (FigmaFlowWindow, TransitionAssetGenerator).
++    /// </summary>
+     public static class TransitionAssetBuilder
+     {
+         public static void Fill(
+@@ -49,9 +60,9 @@
+ 
+             asset.items = result;
+ 
+-#if UNITY_EDITOR
+-            UnityEditor.EditorUtility.SetDirty(asset);
+-#endif
++            EditorUtility.SetDirty(asset);
+         }
+     }
+-}
+\ No newline at end of file
++}
++
++#endif

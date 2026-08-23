@@ -1,0 +1,71 @@
+--- /tmp/o.cs	2026-08-02 08:53:30.559723696 +0000
++++ /tmp/n.cs	2026-08-02 08:53:30.563723696 +0000
+@@ -0,0 +1,68 @@
++using System.Collections.Generic;
++using UnityEngine.UIElements;
++
++namespace FigmaRuntime
++{
++    /// <summary>
++    /// Az OverlayBinder feladata a render párok életciklusának kezelése.
++    ///
++    /// F6 (ADR-007, v0.4): a kötés NEM a Track-eken keresztül történik.
++    /// A trackek kizárólag azon az elemen animálnak, amivel létrehozták
++    /// őket (OverlayTransitionBuilder). A Binder a párok (Current/Target
++    /// node-ok) láthatóságát vezérli az animáció idejére.
++    ///
++    /// Nem animál.
++    /// Nem módosítja a Motion Engine-t.
++    /// Csak a renderelési életciklust kezeli.
++    /// </summary>
++    public class OverlayBinder
++    {
++        private readonly VisualElement root;
++
++        private readonly List<OverlayRenderPair> boundPairs =
++            new();
++
++        public OverlayBinder(VisualElement root)
++        {
++            this.root = root;
++        }
++
++        public void Bind(OverlayRenderData renderData)
++        {
++            UnbindInternal();
++
++            if (renderData == null)
++                return;
++
++            foreach (OverlayRenderPair pair in renderData.Pairs)
++            {
++                if (pair == null)
++                    continue;
++
++                boundPairs.Add(pair);
++
++                pair.Current?.Hide();
++                pair.Target?.Hide();
++            }
++        }
++
++        public void Unbind()
++        {
++            UnbindInternal();
++        }
++
++        private void UnbindInternal()
++        {
++            foreach (OverlayRenderPair pair in boundPairs)
++            {
++                if (pair == null)
++                    continue;
++
++                pair.Current?.Show();
++                pair.Target?.Show();
++            }
++
++            boundPairs.Clear();
++        }
++    }
++}

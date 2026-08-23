@@ -1,0 +1,14 @@
+--- /tmp/orig_norm.cs	2026-08-01 15:20:09.030458727 +0000
++++ /tmp/new_norm.cs	2026-08-01 15:20:09.034458727 +0000
+@@ -9,8 +9,10 @@
+             VisualElement root,
+             string stateName)
+         {
++#if UNITY_EDITOR
+             UnityEngine.Debug.Log(
+-                $"[Capture] {stateName} world={root.worldBound}");
++                $"[FigmaFlow] Capture: {stateName} world={root.worldBound}");
++#endif
+ 
+             var state =
+                 ScriptableObject.CreateInstance<FigmaStateAsset>();

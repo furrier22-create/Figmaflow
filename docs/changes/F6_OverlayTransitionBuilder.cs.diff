@@ -1,0 +1,77 @@
+--- /tmp/o.cs	2026-08-02 08:53:30.567723696 +0000
++++ /tmp/n.cs	2026-08-02 08:53:30.571723696 +0000
+@@ -0,0 +1,74 @@
++using System.Collections.Generic;
++using UnityEngine.UIElements;
++
++namespace FigmaRuntime
++{
++    /// <summary>
++    /// Overlay Transition építő.
++    ///
++    /// A Layout TransitionBuilder-t nem módosítja.
++    /// A Transition ugyanaz marad.
++    ///
++    /// F6 (ADR-007, v0.4): a track NEM kap RenderPair hivatkozást —
++    /// a track kizárólag azon az elemen animál, amivel létrehozták.
++    /// Itt a Current node eleme az animált elem; ha az animációs
++    /// reprezentáció elkészül (RenderNode.SetAnimation), akkor
++    /// ezen a ponton az Animation elemre kell a tracket építeni.
++    /// </summary>
++    public static class OverlayTransitionBuilder
++    {
++        public static Transition Build(
++            TransitionAnalysis analysis,
++            TransitionAsset asset,
++            OverlayRenderData renderData)
++        {
++            Transition transition = new();
++
++            if (analysis == null ||
++                asset == null ||
++                renderData == null)
++            {
++                return transition;
++            }
++
++            Dictionary<string, TransitionItem> itemLookup = new();
++
++            foreach (var item in asset.items)
++                itemLookup[item.path] = item;
++
++            Dictionary<string, OverlayRenderPair> pairLookup = new();
++
++            foreach (var pair in renderData.Pairs)
++                pairLookup[pair.Path] = pair;
++
++            foreach (var candidate in analysis.Candidates)
++            {
++                if (!itemLookup.TryGetValue(candidate.Path, out var item))
++                    continue;
++
++                if (!item.enabled)
++                    continue;
++
++                if (!pairLookup.TryGetValue(candidate.Path, out var pair))
++                    continue;
++
++                if (pair.Current?.Element == null)
++                    continue;
++
++                ElementTrack track = new ElementTrack(
++                    pair.Current.Element,
++                    candidate.From,
++                    candidate.To,
++                    candidate.Properties,
++                    item.delay,
++                    item.duration,
++                    item.ease,
++                    item.customCurve);
++
++                transition.Add(track);
++            }
++
++            return transition;
++        }
++    }
++}

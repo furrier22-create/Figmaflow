@@ -1,0 +1,66 @@
+--- /tmp/orig_norm.cs	2026-08-01 15:20:09.026458727 +0000
++++ /tmp/new_norm.cs	2026-08-01 15:20:09.026458727 +0000
+@@ -25,9 +25,9 @@
+         }
+ 
+         /// <summary>
+-        /// Layout mód betöltése.
+-        /// Overlay módban ezt nem használjuk majd az animációhoz,
+-        /// de a jelenlegi mûködést változatlanul hagyjuk.
++        /// Layout m�d bet�lt�se.
++        /// Overlay m�dban ezt nem haszn�ljuk majd az anim�ci�hoz,
++        /// de a jelenlegi m�k�d�st v�ltozatlanul hagyjuk.
+         /// </summary>
+         public TemplateContainer Load(VisualTreeAsset tree)
+         {
+@@ -44,15 +44,13 @@
+             root.Add(current);
+ 
+ #if UNITY_EDITOR
+-            Debug.Log($"[FigmaFlow] Root children: {root.childCount}");
+-
+-            UnityEngine.Debug.Log(
+-                $"[Host] Root children: {root.childCount}");
++            Debug.Log(
++                $"[FigmaFlow] Load: {tree.name}, root children: {root.childCount}");
+ 
+             foreach (var child in root.Children())
+             {
+-                UnityEngine.Debug.Log(
+-                    $"[Host] Child: {child.GetType().Name}  name={child.name}");
++                Debug.Log(
++                    $"[FigmaFlow]   Child: {child.GetType().Name} name={child.name}");
+             }
+ #endif
+ 
+@@ -60,7 +58,7 @@
+         }
+ 
+         /// <summary>
+-        /// OverlayScene használhatja ezt, hogy a jelenlegi
++        /// OverlayScene haszn�lhatja ezt, hogy a jelenlegi
+         /// TemplateContainert szinkronban tartsa a Hosttal.
+         /// </summary>
+         public void SetCurrent(TemplateContainer container)
+@@ -69,8 +67,8 @@
+         }
+ 
+         /// <summary>
+-        /// Animáció végén meghívjuk.
+-        /// Layout módban egyszerûen lecseréli a teljes UI-t.
++        /// Anim�ci� v�g�n megh�vjuk.
++        /// Layout m�dban egyszer�en lecser�li a teljes UI-t.
+         /// </summary>
+         public TemplateContainer CommitState(VisualTreeAsset tree)
+         {
+@@ -78,8 +76,8 @@
+         }
+ 
+         /// <summary>
+-        /// A root teljes ürítése.
+-        /// Overlay mód inicializálásánál lesz használva.
++        /// A root teljes �r�t�se.
++        /// Overlay m�d inicializ�l�s�n�l lesz haszn�lva.
+         /// </summary>
+         public void Clear()
+         {

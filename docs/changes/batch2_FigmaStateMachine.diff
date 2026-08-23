@@ -1,0 +1,218 @@
+--- /tmp/orig_norm.cs	2026-08-01 15:20:09.022458727 +0000
++++ /tmp/new_norm.cs	2026-08-01 15:20:09.022458727 +0000
+@@ -1,5 +1,4 @@
+ using System.Collections;
+-using System.Diagnostics;
+ using UnityEngine;
+ using UnityEngine.UIElements;
+ 
+@@ -28,7 +27,18 @@
+         {
+             host = GetComponent<FigmaDocumentHost>();
+ 
+-            SelectPlayer();
++            if (profile == null)
++            {
++                Debug.LogWarning(
++                    "[FigmaFlow] profile nincs beállítva — Layout mód alapértelmezéssel.");
++
++                player = GetComponent<TransitionPlayer>();
++            }
++            else
++            {
++                SelectPlayer();
++            }
++
+             SubscribePlayer();
+         }
+ 
+@@ -45,45 +55,65 @@
+                     player = GetComponent<TransitionPlayer>();
+                     break;
+ 
++                // F1 (v0.3.7, ADR-007): az Overlay ág kivezetve a Stable Runtime-ból.
++                // Az OverlayTransitionPlayer az Experimental karanténban él, a Stable
++                // StateMachine nem hivatkozhat rá (asmdef izoláció előfeltétele).
++                // A Smart Overlay a v0.4 feladata — itt Layout fallbackkel folytatjuk.
+                 case AnimationMode.Overlay:
+-                    player = GetComponent<OverlayTransitionPlayer>();
++                    Debug.LogWarning(
++                        "[FigmaFlow] AnimationMode.Overlay még nem része a Stable Runtime-nak " +
++                        "(Experimental, v0.4). Layout player-rel folytatjuk.");
++
++                    player = GetComponent<TransitionPlayer>();
+                     break;
+             }
+         }
+ 
+         void SubscribePlayer()
+         {
++            // F1 (v0.3.7): csak a Stable Layout player létezik.
++            // A Finished esemény ITransitionPlayer interfészre emelése
++            // a v0.4 feladata (player-agnostic StateMachine).
+             if (player is TransitionPlayer tp)
+                 tp.Finished += OnTransitionFinished;
+-
+-            if (player is OverlayTransitionPlayer op)
+-                op.Finished += OnTransitionFinished;
+         }
+ 
+         void UnsubscribePlayer()
+         {
++            // F1 (v0.3.7): ld. SubscribePlayer.
+             if (player is TransitionPlayer tp)
+                 tp.Finished -= OnTransitionFinished;
+-
+-            if (player is OverlayTransitionPlayer op)
+-                op.Finished -= OnTransitionFinished;
+         }
+ 
+         IEnumerator Start()
+         {
+             host.HideRoot();
+ 
++            if (states == null || states.Length == 0)
++            {
++                Debug.LogWarning(
++                    "[FigmaFlow] Nincs state definiálva (states üres) — a runtime nem indul el.");
++
++                host.ShowRoot();
++
++                yield break;
++            }
++
+             capturedStates = new FigmaStateAsset[states.Length];
+ 
+             for (int i = 0; i < states.Length; i++)
+             {
+                 TemplateContainer live = host.Load(states[i]);
+ 
+-                UnityEngine.Debug.Log($"Load {i}");
++#if UNITY_EDITOR
++                Debug.Log($"[FigmaFlow] Load {i}");
++#endif
+ 
+                 yield return null;
+ 
+-                UnityEngine.Debug.Log($"Capture {i}");
++#if UNITY_EDITOR
++                Debug.Log($"[FigmaFlow] Capture {i}");
++#endif
+ 
+                 capturedStates[i] =
+                     StateCapture.Capture(
+@@ -139,11 +169,19 @@
+                 }
+             }
+ 
+-            UnityEngine.Debug.LogWarning($"State not found: {stateName}");
++            UnityEngine.Debug.LogWarning($"[FigmaFlow] State not found: {stateName}");
+         }
+ 
+         public void GoToState(int targetState)
+         {
++            if (capturedStates == null)
++            {
++                Debug.LogWarning(
++                    "[FigmaFlow] A state capture még nem készült el — GoToState figyelmen kívül hagyva.");
++
++                return;
++            }
++
+             if (targetState < 0)
+                 return;
+ 
+@@ -161,12 +199,29 @@
+ 
+         IEnumerator PlayTransition(int targetState)
+         {
++            if (transitionAsset == null)
++            {
++                Debug.LogWarning(
++                    "[FigmaFlow] transitionAsset nincs beállítva — az átmenet nem indítható.");
++
++                pendingState = -1;
++
++                yield break;
++            }
++
+             pendingState = targetState;
+ 
++            float posTol = profile != null ? profile.positionTolerance : 1f;
++            float sizeTol = profile != null ? profile.sizeTolerance : 1f;
++            float opTol = profile != null ? profile.opacityTolerance : 0.01f;
++
+             TransitionAnalysis analysis =
+                 TransitionBuilder.Analyze(
+                     capturedStates[currentState],
+-                    capturedStates[targetState]);
++                    capturedStates[targetState],
++                    posTol,
++                    sizeTol,
++                    opTol);
+ 
+             FigmaFlowRuntime.SetAnalysis(
+                 analysis);
+@@ -177,6 +232,20 @@
+                     transitionAsset,
+                     host.Current);
+ 
++            if (transition == null || transition.Count == 0)
++            {
++                Debug.LogWarning(
++                    "[FigmaFlow] Az átmenet üres (0 track) — a cél állapot közvetlenül commitolva.");
++
++                host.CommitState(
++                    states[pendingState]);
++
++                currentState = pendingState;
++                pendingState = -1;
++
++                yield break;
++            }
++
+             LogTransition(
+                 analysis,
+                 transition);
+@@ -184,8 +253,6 @@
+             player.PlayForward(
+                 transition,
+                 transition.Duration);
+-
+-            yield break;
+         }
+ 
+         void OnTransitionFinished()
+@@ -210,24 +277,14 @@
+             int tracks =
+                 transition?.Count ?? 0;
+ 
+-            int pairs = -1;
+-
+-            if (FigmaFlowRuntime.HasAnalysis)
+-            {
+-                // Késõbb ide kerül majd az OverlayRenderer
+-                // által elõállított Pair szám.
+-                pairs = candidates;
+-            }
+-
+             UnityEngine.Debug.Log(
+ $@"==========================
+-FigmaFlow Transition
++[FigmaFlow] Transition
+ ==========================
+ From        : {states[currentState].name}
+ To          : {states[pendingState].name}
+ 
+ Candidates  : {candidates}
+-Pairs       : {(pairs >= 0 ? pairs.ToString() : "-")}
+ Tracks      : {tracks}
+ 
+ Duration    : {transition?.Duration:F2}
+@@ -235,4 +292,4 @@
+ ==========================");
+         }
+     }
+-}
+\ No newline at end of file
++}

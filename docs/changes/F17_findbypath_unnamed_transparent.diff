@@ -1,0 +1,66 @@
+--- /tmp/vtu_orig_utf8.cs	2026-08-01 15:03:46.663752520 +0000
++++ FigmaFlow/Assets/FigmaRuntime/Core/VisualTreeUtility.cs	2026-08-01 15:03:40.551752520 +0000
+@@ -32,6 +32,10 @@
+ 
+         /// <summary>
+         /// Path alapú keresés.
++        ///
++        /// A StateCapture path-építése a névtelen elemeket átugorja
++        /// (lásd StateCapture.Scan). Ez a keresés ugyanazt a szemantikát
++        /// követi: a névtelen elemek átlátszóak a navigációban.
+         /// </summary>
+         public static VisualElement FindByPath(
+             VisualElement root,
+@@ -54,7 +58,7 @@
+                 if (string.IsNullOrWhiteSpace(part))
+                     continue;
+ 
+-                current = FindDirectChild(
++                current = FindNextNamed(
+                     current,
+                     part);
+ 
+@@ -66,6 +70,43 @@
+         }
+ 
+         /// <summary>
++        /// A következő elnevezett elem keresése, a névtelen
++        /// köztes elemek átugrásával.
++        ///
++        /// Elsőbbség: közvetlen, elnevezett gyermek.
++        /// Ha nincs, a névtelen gyermekekben folytatja a keresést.
++        /// </summary>
++        static VisualElement FindNextNamed(
++            VisualElement parent,
++            string part)
++        {
++            if (parent == null)
++                return null;
++
++            foreach (VisualElement child in parent.Children())
++            {
++                if (child.name == part)
++                    return child;
++            }
++
++            foreach (VisualElement child in parent.Children())
++            {
++                if (string.IsNullOrEmpty(child.name))
++                {
++                    VisualElement found =
++                        FindNextNamed(
++                            child,
++                            part);
++
++                    if (found != null)
++                        return found;
++                }
++            }
++
++            return null;
++        }
++
++        /// <summary>
+         /// Közvetlen gyermek keresése név alapján.
+         /// </summary>
+         public static VisualElement FindDirectChild(

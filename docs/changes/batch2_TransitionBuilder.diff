@@ -1,0 +1,89 @@
+--- /tmp/tb_orig.cs	2026-08-01 15:20:09.042458727 +0000
++++ /tmp/tb_new.cs	2026-08-01 15:20:09.042458727 +0000
+@@ -6,13 +6,12 @@
+ {
+     public static class TransitionBuilder
+     {
+-        const float PositionTolerance = 1f;
+-        const float SizeTolerance = 1f;
+-        const float OpacityTolerance = 0.01f;
+-
+         public static TransitionAnalysis Analyze(
+             FigmaStateAsset from,
+-            FigmaStateAsset to)
++            FigmaStateAsset to,
++            float positionTolerance = 1f,
++            float sizeTolerance = 1f,
++            float opacityTolerance = 0.01f)
+         {
+             TransitionAnalysis analysis = new();
+ 
+@@ -27,7 +26,12 @@
+                     continue;
+ 
+                 AnimatedProperties props =
+-                    GetChangedProperties(source, target);
++                    GetChangedProperties(
++                        source,
++                        target,
++                        positionTolerance,
++                        sizeTolerance,
++                        opacityTolerance);
+ 
+                 if (props == AnimatedProperties.None)
+                     continue;
+@@ -68,8 +72,9 @@
+                     continue;
+ 
+                 VisualElement live =
+-                    liveRoot.Q<VisualElement>(
+-                        candidate.From.name);
++                    VisualTreeUtility.FindByPath(
++                        liveRoot,
++                        candidate.Path);
+ 
+                 if (live == null)
+                     continue;
+@@ -91,7 +96,10 @@
+ 
+         static AnimatedProperties GetChangedProperties(
+             ElementData from,
+-            ElementData to)
++            ElementData to,
++            float positionTolerance,
++            float sizeTolerance,
++            float opacityTolerance)
+         {
+             AnimatedProperties props =
+                 AnimatedProperties.None;
+@@ -100,8 +108,8 @@
+             // STYLE POSITION
+             // -------------------------------------------------
+ 
+-            if (Mathf.Abs(from.left - to.left) > PositionTolerance ||
+-                Mathf.Abs(from.top - to.top) > PositionTolerance)
++            if (Mathf.Abs(from.left - to.left) > positionTolerance ||
++                Mathf.Abs(from.top - to.top) > positionTolerance)
+             {
+                 props |= AnimatedProperties.Position;
+             }
+@@ -110,8 +118,8 @@
+             // STYLE SIZE
+             // -------------------------------------------------
+ 
+-            if (Mathf.Abs(from.width - to.width) > SizeTolerance ||
+-                Mathf.Abs(from.height - to.height) > SizeTolerance)
++            if (Mathf.Abs(from.width - to.width) > sizeTolerance ||
++                Mathf.Abs(from.height - to.height) > sizeTolerance)
+             {
+                 props |= AnimatedProperties.Size;
+             }
+@@ -120,7 +128,7 @@
+             // VISUAL
+             // -------------------------------------------------
+ 
+-            if (Mathf.Abs(from.opacity - to.opacity) > OpacityTolerance)
++            if (Mathf.Abs(from.opacity - to.opacity) > opacityTolerance)
+             {
+                 props |= AnimatedProperties.Opacity;
+             }

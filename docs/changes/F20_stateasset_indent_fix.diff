@@ -1,0 +1,72 @@
+--- uploads/FigmaStateAsset.cs	2026-08-01 15:08:26.655752653 +0000
++++ FigmaFlow/Assets/FigmaRuntime/Data/FigmaStateAsset.cs	2026-08-01 15:08:54.115752653 +0000
+@@ -1,39 +1,39 @@
+-    using System;
+-    using System.Collections.Generic;
+-    using UnityEngine;
+-
+-    namespace FigmaRuntime
++using System;
++using System.Collections.Generic;
++using UnityEngine;
++
++namespace FigmaRuntime
++{
++    [CreateAssetMenu(menuName = "FigmaFlow/State")]
++    public class FigmaStateAsset : ScriptableObject
+     {
+-        [CreateAssetMenu(menuName = "FigmaFlow/State")]
+-        public class FigmaStateAsset : ScriptableObject
+-        {
+-            public string stateName;
++        public string stateName;
+ 
+-            public List<ElementData> elements = new();
+-        }
++        public List<ElementData> elements = new();
++    }
+ 
+-        [Serializable]
+-        public class ElementData
+-        {
+-            public string name;
++    [Serializable]
++    public class ElementData
++    {
++        public string name;
+ 
+-            public string path;
++        public string path;
+ 
+-            // Render
+-            public Rect worldRect;
++        // Render
++        public Rect worldRect;
+ 
+-            // Layout (Style)
+-            public float left;
+-            public float top;
++        // Layout (Style)
++        public float left;
++        public float top;
+ 
+-            public float width;
+-            public float height;
++        public float width;
++        public float height;
+ 
+-            // Visual
+-            public float opacity;
++        // Visual
++        public float opacity;
+ 
+-            public float rotation;
++        public float rotation;
+ 
+-            public Vector2 scale = Vector2.one;
+-        }
+-    }
+\ No newline at end of file
++        public Vector2 scale = Vector2.one;
++    }
++}

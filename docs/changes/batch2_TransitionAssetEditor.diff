@@ -1,0 +1,59 @@
+--- /tmp/orig_norm.cs	2026-08-01 15:20:09.038458727 +0000
++++ /tmp/new_norm.cs	2026-08-01 15:20:09.038458727 +0000
+@@ -1,4 +1,4 @@
+-ï»¿#if UNITY_EDITOR
++#if UNITY_EDITOR
+ 
+ using System.Linq;
+ using UnityEditor;
+@@ -52,7 +52,7 @@
+             GUILayout.Space(8);
+ 
+             DrawSection(
+-                "â Favorites",
++                "★ Favorites",
+                 asset.items.Where(i => i.favorite));
+ 
+             DrawSection(
+@@ -116,7 +116,7 @@
+             item.favorite =
+                 GUILayout.Toggle(
+                     item.favorite,
+-                    "â",
++                    "★",
+                     GUILayout.Width(24));
+ 
+             EditorGUILayout.LabelField(
+@@ -145,14 +145,24 @@
+                 (EaseType)EditorGUILayout.EnumPopup(
+                     "Motion",
+                     item.ease);
+-                  
+-                    if (item.ease == EaseType.CustomBezier)
+-{
+-    item.customCurve =
+-        EditorGUILayout.CurveField(
+-            "Curve",
+-            item.customCurve);
+-}
++
++            if (item.ease == EaseType.CustomSpring)
++            {
++                // F7/F25 (v0.3.7): a CustomSpring a MotionUtility-ban még
++                // nincs implementálva (stub, lineárisan viselkedik) — v0.4.
++                EditorGUILayout.HelpBox(
++                    "CustomSpring még nincs implementálva (v0.4). " +
++                    "Amíg nem készül el, lineárisan viselkedik.",
++                    MessageType.Warning);
++            }
++
++            if (item.ease == EaseType.CustomBezier)
++            {
++                item.customCurve =
++                    EditorGUILayout.CurveField(
++                        "Curve",
++                        item.customCurve);
++            }
+             item.animationMode =
+                 (AnimationMode)EditorGUILayout.EnumPopup(
+                     "Mode",

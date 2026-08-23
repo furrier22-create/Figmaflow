@@ -1,0 +1,314 @@
+--- uploads/../uploads/TransitionBuilder.cs	2026-08-01 15:02:36.619752520 +0000
++++ FigmaFlow/Assets/FigmaRuntime/Core/TransitionBuilder.cs	2026-08-01 15:02:41.531752520 +0000
+@@ -1,155 +1,156 @@
+-using System.Collections.Generic;
+-using UnityEngine;
+-using UnityEngine.UIElements;
+-
+-namespace FigmaRuntime
+-{
+-    public static class TransitionBuilder
+-    {
+-        const float PositionTolerance = 1f;
+-        const float SizeTolerance = 1f;
+-        const float OpacityTolerance = 0.01f;
+-
+-        public static TransitionAnalysis Analyze(
+-            FigmaStateAsset from,
+-            FigmaStateAsset to)
+-        {
+-            TransitionAnalysis analysis = new();
+-
+-            Dictionary<string, ElementData> targetLookup = new();
+-
+-            foreach (var e in to.elements)
+-                targetLookup[e.path] = e;
+-
+-            foreach (var source in from.elements)
+-            {
+-                if (!targetLookup.TryGetValue(source.path, out var target))
+-                    continue;
+-
+-                AnimatedProperties props =
+-                    GetChangedProperties(source, target);
+-
+-                if (props == AnimatedProperties.None)
+-                    continue;
+-
+-                analysis.Candidates.Add(
+-                    new TrackCandidate()
+-                    {
+-                        Path = source.path,
+-                        From = source,
+-                        To = target,
+-                        Properties = props
+-                    });
+-            }
+-
+-            Optimize(analysis.Candidates);
+-
+-            return analysis;
+-        }
+-
+-        public static Transition Build(
+-            TransitionAnalysis analysis,
+-            TransitionAsset asset,
+-            VisualElement liveRoot)
+-        {
+-            Transition transition = new();
+-
+-            Dictionary<string, TransitionItem> lookup = new();
+-
+-            foreach (var item in asset.items)
+-                lookup[item.path] = item;
+-
+-            foreach (var candidate in analysis.Candidates)
+-            {
+-                if (!lookup.TryGetValue(candidate.Path, out var item))
+-                    continue;
+-
+-                if (!item.enabled)
+-                    continue;
+-
+-                VisualElement live =
+-                    liveRoot.Q<VisualElement>(
+-                        candidate.From.name);
+-
+-                if (live == null)
+-                    continue;
+-
+-                transition.Add(
+-                    new ElementTrack(
+-                        live,
+-                        candidate.From,
+-                        candidate.To,
+-                        candidate.Properties,
+-                        item.delay,
+-                        item.duration,
+-                        item.ease,
+-                        item.customCurve));
+-            }
+-
+-            return transition;
+-        }
+-
+-        static AnimatedProperties GetChangedProperties(
+-            ElementData from,
+-            ElementData to)
+-        {
+-            AnimatedProperties props =
+-                AnimatedProperties.None;
+-
+-            // -------------------------------------------------
+-            // STYLE POSITION
+-            // -------------------------------------------------
+-
+-            if (Mathf.Abs(from.left - to.left) > PositionTolerance ||
+-                Mathf.Abs(from.top - to.top) > PositionTolerance)
+-            {
+-                props |= AnimatedProperties.Position;
+-            }
+-
+-            // -------------------------------------------------
+-            // STYLE SIZE
+-            // -------------------------------------------------
+-
+-            if (Mathf.Abs(from.width - to.width) > SizeTolerance ||
+-                Mathf.Abs(from.height - to.height) > SizeTolerance)
+-            {
+-                props |= AnimatedProperties.Size;
+-            }
+-
+-            // -------------------------------------------------
+-            // VISUAL
+-            // -------------------------------------------------
+-
+-            if (Mathf.Abs(from.opacity - to.opacity) > OpacityTolerance)
+-            {
+-                props |= AnimatedProperties.Opacity;
+-            }
+-
+-            return props;
+-        }
+-
+-        static void Optimize(List<TrackCandidate> candidates)
+-        {
+-            candidates.Sort((a, b) =>
+-                a.Path.Length.CompareTo(b.Path.Length));
+-
+-            List<TrackCandidate> remove = new();
+-
+-            for (int i = 0; i < candidates.Count; i++)
+-            {
+-                string parent = candidates[i].Path + "/";
+-
+-                for (int j = i + 1; j < candidates.Count; j++)
+-                {
+-                    if (candidates[j].Path.StartsWith(parent))
+-                    {
+-                        remove.Add(candidates[j]);
+-                    }
+-                }
+-            }
+-
+-            foreach (var r in remove)
+-                candidates.Remove(r);
+-        }
+-    }
++using System.Collections.Generic;
++using UnityEngine;
++using UnityEngine.UIElements;
++
++namespace FigmaRuntime
++{
++    public static class TransitionBuilder
++    {
++        const float PositionTolerance = 1f;
++        const float SizeTolerance = 1f;
++        const float OpacityTolerance = 0.01f;
++
++        public static TransitionAnalysis Analyze(
++            FigmaStateAsset from,
++            FigmaStateAsset to)
++        {
++            TransitionAnalysis analysis = new();
++
++            Dictionary<string, ElementData> targetLookup = new();
++
++            foreach (var e in to.elements)
++                targetLookup[e.path] = e;
++
++            foreach (var source in from.elements)
++            {
++                if (!targetLookup.TryGetValue(source.path, out var target))
++                    continue;
++
++                AnimatedProperties props =
++                    GetChangedProperties(source, target);
++
++                if (props == AnimatedProperties.None)
++                    continue;
++
++                analysis.Candidates.Add(
++                    new TrackCandidate()
++                    {
++                        Path = source.path,
++                        From = source,
++                        To = target,
++                        Properties = props
++                    });
++            }
++
++            Optimize(analysis.Candidates);
++
++            return analysis;
++        }
++
++        public static Transition Build(
++            TransitionAnalysis analysis,
++            TransitionAsset asset,
++            VisualElement liveRoot)
++        {
++            Transition transition = new();
++
++            Dictionary<string, TransitionItem> lookup = new();
++
++            foreach (var item in asset.items)
++                lookup[item.path] = item;
++
++            foreach (var candidate in analysis.Candidates)
++            {
++                if (!lookup.TryGetValue(candidate.Path, out var item))
++                    continue;
++
++                if (!item.enabled)
++                    continue;
++
++                VisualElement live =
++                    VisualTreeUtility.FindByPath(
++                        liveRoot,
++                        candidate.Path);
++
++                if (live == null)
++                    continue;
++
++                transition.Add(
++                    new ElementTrack(
++                        live,
++                        candidate.From,
++                        candidate.To,
++                        candidate.Properties,
++                        item.delay,
++                        item.duration,
++                        item.ease,
++                        item.customCurve));
++            }
++
++            return transition;
++        }
++
++        static AnimatedProperties GetChangedProperties(
++            ElementData from,
++            ElementData to)
++        {
++            AnimatedProperties props =
++                AnimatedProperties.None;
++
++            // -------------------------------------------------
++            // STYLE POSITION
++            // -------------------------------------------------
++
++            if (Mathf.Abs(from.left - to.left) > PositionTolerance ||
++                Mathf.Abs(from.top - to.top) > PositionTolerance)
++            {
++                props |= AnimatedProperties.Position;
++            }
++
++            // -------------------------------------------------
++            // STYLE SIZE
++            // -------------------------------------------------
++
++            if (Mathf.Abs(from.width - to.width) > SizeTolerance ||
++                Mathf.Abs(from.height - to.height) > SizeTolerance)
++            {
++                props |= AnimatedProperties.Size;
++            }
++
++            // -------------------------------------------------
++            // VISUAL
++            // -------------------------------------------------
++
++            if (Mathf.Abs(from.opacity - to.opacity) > OpacityTolerance)
++            {
++                props |= AnimatedProperties.Opacity;
++            }
++
++            return props;
++        }
++
++        static void Optimize(List<TrackCandidate> candidates)
++        {
++            candidates.Sort((a, b) =>
++                a.Path.Length.CompareTo(b.Path.Length));
++
++            List<TrackCandidate> remove = new();
++
++            for (int i = 0; i < candidates.Count; i++)
++            {
++                string parent = candidates[i].Path + "/";
++
++                for (int j = i + 1; j < candidates.Count; j++)
++                {
++                    if (candidates[j].Path.StartsWith(parent))
++                    {
++                        remove.Add(candidates[j]);
++                    }
++                }
++            }
++
++            foreach (var r in remove)
++                candidates.Remove(r);
++        }
++    }
+ }
+\ No newline at end of file

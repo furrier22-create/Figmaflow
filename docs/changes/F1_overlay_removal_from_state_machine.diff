@@ -1,0 +1,74 @@
+--- uploads/FigmaStateMachine.cs	2026-08-01 14:59:32.160690857 +0000
++++ FigmaFlow/Assets/FigmaRuntime/Runtime/FigmaStateMachine.cs	2026-08-01 15:00:34.828690857 +0000
+@@ -1,7 +1,6 @@
+-using System.Collections;
+-using System.Diagnostics;
+-using UnityEngine;
+-using UnityEngine.UIElements;
++using System.Collections;
++using UnityEngine;
++using UnityEngine.UIElements;
+ 
+ namespace FigmaRuntime
+ {
+@@ -45,28 +44,34 @@
+                     player = GetComponent<TransitionPlayer>();
+                     break;
+ 
++                // F1 (v0.3.7, ADR-007): az Overlay ág kivezetve a Stable Runtime-ból.
++                // Az OverlayTransitionPlayer az Experimental karanténban él, a Stable
++                // StateMachine nem hivatkozhat rá (asmdef izoláció előfeltétele).
++                // A Smart Overlay a v0.4 feladata — itt Layout fallbackkel folytatjuk.
+                 case AnimationMode.Overlay:
+-                    player = GetComponent<OverlayTransitionPlayer>();
++                    Debug.LogWarning(
++                        "[FigmaFlow] AnimationMode.Overlay még nem része a Stable Runtime-nak " +
++                        "(Experimental, v0.4). Layout player-rel folytatjuk.");
++
++                    player = GetComponent<TransitionPlayer>();
+                     break;
+             }
+         }
+ 
+         void SubscribePlayer()
+         {
++            // F1 (v0.3.7): csak a Stable Layout player létezik.
++            // A Finished esemény ITransitionPlayer interfészre emelése
++            // a v0.4 feladata (player-agnostic StateMachine).
+             if (player is TransitionPlayer tp)
+                 tp.Finished += OnTransitionFinished;
+-
+-            if (player is OverlayTransitionPlayer op)
+-                op.Finished += OnTransitionFinished;
+         }
+ 
+         void UnsubscribePlayer()
+         {
++            // F1 (v0.3.7): ld. SubscribePlayer.
+             if (player is TransitionPlayer tp)
+                 tp.Finished -= OnTransitionFinished;
+-
+-            if (player is OverlayTransitionPlayer op)
+-                op.Finished -= OnTransitionFinished;
+         }
+ 
+         IEnumerator Start()
+@@ -214,8 +219,8 @@
+ 
+             if (FigmaFlowRuntime.HasAnalysis)
+             {
+-                // K�s�bb ide ker�l majd az OverlayRenderer
+-                // �ltal el��ll�tott Pair sz�m.
++                // K�s�bb ide ker�l majd az OverlayRenderer
++                // �ltal el��ll�tott Pair sz�m.
+                 pairs = candidates;
+             }
+ 
+@@ -235,4 +240,4 @@
+ ==========================");
+         }
+     }
+-}
+\ No newline at end of file
++}
+\ No newline at end of file
