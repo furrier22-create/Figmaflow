@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="Screen" style="flex-grow: 1;">
+        <ui:Label name="Title" text="FigmaFlow Dropdown Demo" style="font-size: 24px; -unity-text-align: middle-center; margin-top: 80px;" />
+        <ui:VisualElement name="DropArea" style="position: absolute; left: 100px; top: 60px; width: 220px;">
+            <ui:Button name="DropdownButton" text="Válassz opciót ▾" style="width: 220px; height: 44px; font-size: 16px;" />
+            <ui:VisualElement name="DropdownMenu" style="position: absolute; left: 0; top: 48px; width: 220px; background-color: rgba(255, 255, 255, 0.97); border-radius: 6px; padding: 4px;">
+                <ui:Button name="OptionRed" text="Piros" style="width: 100%; height: 34px;" />
+                <ui:Button name="OptionGreen" text="Zöld" style="width: 100%; height: 34px;" />
+                <ui:Button name="OptionBlue" text="Kék" style="width: 100%; height: 34px;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label name="Selection" text="" style="position: absolute; left: 100px; top: 120px; font-size: 14px; color: gray;" />
+    </ui:VisualElement>
+</ui:UXML>

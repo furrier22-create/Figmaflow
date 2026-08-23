@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="Screen" style="flex-grow: 1;">
+        <ui:VisualElement name="TopBar" style="flex-direction: row; justify-content: flex-end; padding: 16px;">
+            <ui:Button name="OpenMenu" text="Menü" style="width: 100px; height: 40px;" />
+        </ui:VisualElement>
+        <ui:Label name="Title" text="FigmaFlow Popup Demo" style="font-size: 24px; -unity-text-align: middle-center; margin-top: 80px;" />
+    </ui:VisualElement>
+</ui:UXML>

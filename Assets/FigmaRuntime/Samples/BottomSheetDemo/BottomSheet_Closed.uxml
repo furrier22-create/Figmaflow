@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="Screen" style="flex-grow: 1; align-items: center; justify-content: center;">
+        <ui:Label name="Title" text="FigmaFlow Bottom Sheet Demo" style="font-size: 24px; -unity-text-align: middle-center; margin-bottom: 20px;" />
+        <ui:Button name="OpenSheet" text="Megnyitás" style="width: 160px; height: 44px; font-size: 16px;" />
+    </ui:VisualElement>
+</ui:UXML>

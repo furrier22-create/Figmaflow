@@ -1,0 +1,16 @@
+{
+    "name": "FigmaRuntime.Experimental",
+    "rootNamespace": "FigmaRuntime",
+    "references": [
+        "FigmaRuntime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

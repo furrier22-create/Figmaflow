@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="Screen" style="flex-grow: 1;">
+        <ui:Label name="Title" text="FigmaFlow Hero Demo" style="font-size: 24px; -unity-text-align: middle-center; margin-top: 40px;" />
+        <ui:VisualElement name="HeroCard" style="position: absolute; left: 60px; top: 150px; width: 180px; height: 120px; background-color: rgb(52, 120, 246); border-radius: 12px; align-items: center; justify-content: center;">
+            <ui:Label name="HeroTitle" text="Megnyitás" style="font-size: 18px; color: white;" />
+        </ui:VisualElement>
+        <ui:Label name="Hint" text="Kattints a kártyára" style="position: absolute; left: 60px; top: 290px; font-size: 14px; color: gray;" />
+    </ui:VisualElement>
+</ui:UXML>

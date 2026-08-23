@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="Screen" style="flex-grow: 1; align-items: center; justify-content: center;">
+        <ui:Label name="Title" text="FigmaFlow Dialog Demo" style="font-size: 24px; -unity-text-align: middle-center;" />
+    </ui:VisualElement>
+
+    <ui:VisualElement name="Backdrop" style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); align-items: center; justify-content: center;">
+        <ui:VisualElement name="DialogPanel" style="width: 320px; height: 180px; background-color: rgba(255, 255, 255, 0.95); border-radius: 8px; align-items: center; justify-content: center;">
+            <ui:Label name="DialogTitle" text="FigmaFlow dialog" style="font-size: 20px; margin-bottom: 16px;" />
+            <ui:Button name="CloseDialog" text="Bezárás" style="width: 120px; height: 40px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
