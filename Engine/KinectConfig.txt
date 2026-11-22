@@ -1,0 +1,28 @@
+smoothnum 5
+clickwait 30
+clickgap 60
+clickth 0.02
+xratio 1.2
+xoffset -0.6
+yratio 1.2
+yoffset 0.4
+maxzval 3
+minzval 1
+maxxval 2
+minxval -2
+leftxval -1
+rightxval 1
+keygap 40
+xspeed 0.11
+yspeed 0.13
+openwaitclick 0
+opencloseclick 0
+openmousemove 1
+openwave 1
+ishidewindow 0
+
+cout << "//----------------------------------------------------------------";
+cout << "//config.txt为配置文件，名称和值之间由空格间开：smoothnum平滑次数；";
+cout << "//clickwait停留多久触发点击；clickgap单机的触发间隔；clickth触发点击的波动范围；";
+cout << "//xratio鼠标垫的水平范围；xoffset鼠标垫的水平偏移；";
+cout << "//yratio鼠标垫的垂直范围；yoffset鼠标垫的垂直偏移；";
