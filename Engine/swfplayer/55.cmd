@@ -1,1 +1,0 @@
-start FlashPlayer.exe C:\Users\lw\Desktop\Tools\flashplayer\swffiles\woso3_flash_33\woso3_flash_33.swf
